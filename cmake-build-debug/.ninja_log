@@ -1,0 +1,15 @@
+# ninja log v6
+1	1486	7669203106189463	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+1487	1732	7669203121045806	image_processing_project.exe	e932ca3dbaa88f2e
+3	1860	7669205177907984	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+1860	2034	7669205196477441	image_processing_project.exe	e932ca3dbaa88f2e
+3	1299	7669209576888474	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+1300	1468	7669209589851294	image_processing_project.exe	e932ca3dbaa88f2e
+2	1370	7669209892788142	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+1370	1531	7669209906459894	image_processing_project.exe	e932ca3dbaa88f2e
+3	2001	7669213104405664	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+2002	2237	7669213124387233	image_processing_project.exe	e932ca3dbaa88f2e
+3	2071	7669236431545064	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+2071	2230	7669236452221447	image_processing_project.exe	e932ca3dbaa88f2e
+2	1733	7669237451895503	CMakeFiles/image_processing_project.dir/main.cpp.obj	a4d150c1328496f
+1733	1929	7669237469205604	image_processing_project.exe	e932ca3dbaa88f2e
