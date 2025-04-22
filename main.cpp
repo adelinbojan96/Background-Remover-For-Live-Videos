@@ -7,82 +7,76 @@
 using namespace std;
 using namespace cv;
 
+const string youtubeLink = "https://www.youtube.com/watch?v=iJ0GXMSDPsM&ab_channel=RailCamNetherlands";
+const double alpha = 0.008;
+
 string getYoutubeStreamURL(const string& videoLink) {
-    array<char, 1024> buffer;
+    array<char,4096> buffer{};
     string result;
-    string cmd = "yt-dlp -g \"" + videoLink + "\"";
-    shared_ptr<FILE> pipe(_popen(cmd.c_str(), "r"), _pclose);
+    const string cmd = "yt-dlp -g \"" + videoLink + "\"";
+    const shared_ptr<FILE> pipe(_popen(cmd.c_str(), "r"), _pclose);
     if (!pipe) throw runtime_error("yt-dlp popen() failed");
-    while (fgets(buffer.data(), buffer.size(), pipe.get())) {
+    while (fgets(buffer.data(), buffer.size(), pipe.get()))
         result += buffer.data();
-    }
     if (!result.empty() && result.back() == '\n')
         result.pop_back();
     return result;
 }
 
-Ptr<BackgroundSubtractor> initBackgroundSubtractor(double history = 500,
-                                                   double varThreshold = 16,
-                                                   bool detectShadows = true) {
-    return createBackgroundSubtractorMOG2(history, varThreshold, detectShadows);
-}
-
-void processStream(const string& streamURL, const Mat& newBg) {
-    VideoCapture cap(streamURL);
+void processStream(const string& streamURL) {
+    VideoCapture cap(streamURL, CAP_FFMPEG);
     if (!cap.isOpened()) {
-        cerr << "ERROR: Cannot open stream\n";
+        cerr << "error -> Cannot open stream\n";
         return;
     }
 
-    Ptr<BackgroundSubtractor> backSub = initBackgroundSubtractor();
+    const Size targetSize(1280,720);
+    Mat raw, frame, gray, bgModelF, bgModel, diff, fgMask, cleanMask;
 
-    Size sz((int)cap.get(CAP_PROP_FRAME_WIDTH),
-            (int)cap.get(CAP_PROP_FRAME_HEIGHT));
-    Mat frame(sz, CV_8UC3),
-        fgMask(sz, CV_8UC1),
-        fgMaskClean(sz, CV_8UC1),
-        composite(sz, CV_8UC3),
-        background;
-    resize(newBg, background, sz);
-
-    // Pre-built morphology kernels
-    Mat kernelOpen   = getStructuringElement(MORPH_ELLIPSE, Size(3,3));
-    Mat kernelDilate = getStructuringElement(MORPH_ELLIPSE, Size(5,5));
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3,3));
+    bool initialized = false;
 
     while (true) {
-        if (!cap.read(frame) || frame.empty()) break;
+        if (!cap.read(raw) || raw.empty()) break;
+        resize(raw, frame, targetSize);
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
 
-        backSub->apply(frame, fgMask);
-        morphologyEx(fgMask,     fgMaskClean, MORPH_OPEN,   kernelOpen);
-        morphologyEx(fgMaskClean,fgMaskClean, MORPH_DILATE, kernelDilate);
+        if (!initialized) {
+            gray.convertTo(bgModelF, CV_32F);
+            initialized = true;
+        } else {
+            Mat grayF;
+            gray.convertTo(grayF, CV_32F);
+            accumulateWeighted(grayF, bgModelF, alpha);
+        }
 
-        background.copyTo(composite);
-        frame.copyTo(composite, fgMaskClean);
+        bgModelF.convertTo(bgModel, CV_8U);
+        absdiff(gray, bgModel, diff);
+        threshold(diff, fgMask, 25, 255, THRESH_BINARY);
+        morphologyEx(fgMask, cleanMask, MORPH_OPEN, kernel);
 
-        imshow("Composite", composite);
-        if (waitKey(1) == 27) break;  // ESC
+        Mat greenBg(frame.size(), frame.type(), Scalar(0,255,0));
+        Mat result = frame.clone();
+        greenBg.copyTo(result, cleanMask == 0);
+
+        imshow("Live Stream", frame);
+        imshow("Background Result", result);
+
+        if (waitKey(1) == 27) break;
     }
+
     cap.release();
     destroyAllWindows();
 }
 
 int main() {
     try {
-        string youtubeLink = "https://www.youtube.com/watch?v=rnXIjl_Rzy4&ab_channel=EarthCam";
-        cout << "Fetching stream URL...\n";
-        string streamURL = getYoutubeStreamURL(youtubeLink);
-        cout << "Stream URL: " << streamURL << "\n";
-
-        Mat newBg = imread("background.jpg");
-        if (newBg.empty()) {
-            cerr << "ERROR: Cannot load background.jpg\n";
-            return -1;
-        }
-
-        processStream(streamURL, newBg);
-    }
-    catch (const exception& e) {
-        cerr << "Exception: " << e.what() << "\n";
+        cout << "fetching stream URL...\n";
+        const string url = getYoutubeStreamURL(youtubeLink);
+        cout << "stream URL: " << url << "\n";
+        processStream(url);
+    } catch (const exception& e) {
+        cerr << e.what() << "\n";
         return -1;
     }
     return 0;
