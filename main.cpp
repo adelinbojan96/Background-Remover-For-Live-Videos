@@ -27,6 +27,7 @@ string getYoutubeStreamURL(const string& videoLink) {
     return result;
 }
 
+//TODO: MAKE MORE LOW LEVEL HERE! si ma filmez cu camera prin cluuuj
 Mat captureBackground(const string& streamURL, int history = 200, double learningRate = 0.03) {
     VideoCapture cap(streamURL, CAP_FFMPEG);
     if (!cap.isOpened())
@@ -80,8 +81,21 @@ void processStream(const string& streamURL, const Mat& staticBg) {
             accumulateWeighted(grayF, bgModelF, ALPHA);
         }
         bgModelF.convertTo(bgModel, CV_8U);
-        absdiff(gray, bgModel, diff);
-        threshold(diff, fgMask, 25, 255, THRESH_BINARY);
+        diff = Mat(gray.size(), CV_8U);
+        for (int y = 0; y < gray.rows; ++y)
+            for (int x = 0; x < gray.cols; ++x) {
+                int a = gray.at<uchar>(y, x);
+                int b = bgModel.at<uchar>(y, x);
+                diff.at<uchar>(y, x) = (abs(a - b));
+            }
+
+        fgMask = Mat(diff.size(), CV_8U);
+        for (int y = 0; y < diff.rows; ++y)
+            for (int x = 0; x < diff.cols; ++x) {
+                uchar val = diff.at<uchar>(y, x);
+                fgMask.at<uchar>(y, x) = (val > 25) ? 255 : 0;
+            }
+
         morphologyEx(fgMask, cleanMask, MORPH_OPEN, kernel);
 
         // green-screen replacement
@@ -111,11 +125,11 @@ int main() {
     try {
         vector<pair<string, string>> streams = {
             { "RailCam Netherlands", "https://www.youtube.com/watch?v=iJ0GXMSDPsM&ab_channel=RailCamNetherlands" },
-            { "EarthCam – Times Square", "https://www.youtube.com/watch?v=j9Sa4uBGGQ0&ab_channel=EarthCam" },
+            { "EarthCam Times Square", "https://www.youtube.com/watch?v=j9Sa4uBGGQ0&ab_channel=EarthCam" },
             { "Amsterdam Schiphol Airport", "https://www.youtube.com/watch?v=BTbdzpWBkg0&ab_channel=AMSLIVE" }
         };
         cout << "Please select a live stream:\n";
-        for (size_t i = 0; i < streams.size(); ++i)
+        for (int i = 0; i < streams.size(); ++i)
             cout << i+1 << ". " << streams[i].first << "\n";
 
         int choice = 0;
