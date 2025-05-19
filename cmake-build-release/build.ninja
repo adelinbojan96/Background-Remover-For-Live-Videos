@@ -49,6 +49,14 @@ cmake_ninja_workdir = C$:\Users\adeli\CLionProjects\image_processing\cmake-build
 
 build cmake_object_order_depends_target_image_processing_project: phony || .
 
+build CMakeFiles\image_processing_project.dir\static_camera.cpp.obj: CXX_COMPILER__image_processing_project_unscanned_Release C$:\Users\adeli\CLionProjects\image_processing\static_camera.cpp || cmake_object_order_depends_target_image_processing_project
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++17 -MD
+  INCLUDES = -external:IC:\OpenCV\opencv\build\include -external:W0
+  OBJECT_DIR = CMakeFiles\image_processing_project.dir
+  OBJECT_FILE_DIR = CMakeFiles\image_processing_project.dir
+  TARGET_COMPILE_PDB = CMakeFiles\image_processing_project.dir\
+  TARGET_PDB = image_processing_project.pdb
+
 build CMakeFiles\image_processing_project.dir\main.cpp.obj: CXX_COMPILER__image_processing_project_unscanned_Release C$:\Users\adeli\CLionProjects\image_processing\main.cpp || cmake_object_order_depends_target_image_processing_project
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++17 -MD
   INCLUDES = -external:IC:\OpenCV\opencv\build\include -external:W0
@@ -65,7 +73,7 @@ build CMakeFiles\image_processing_project.dir\main.cpp.obj: CXX_COMPILER__image_
 #############################################
 # Link the executable image_processing_project.exe
 
-build image_processing_project.exe: CXX_EXECUTABLE_LINKER__image_processing_project_Release CMakeFiles\image_processing_project.dir\main.cpp.obj | C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib
+build image_processing_project.exe: CXX_EXECUTABLE_LINKER__image_processing_project_Release CMakeFiles\image_processing_project.dir\static_camera.cpp.obj CMakeFiles\image_processing_project.dir\main.cpp.obj | C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib C$:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -MD
   LINK_FLAGS = /machine:x64 /INCREMENTAL:NO /subsystem:console
   LINK_LIBRARIES = C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  C:\OpenCV\opencv\build\x64\vc16\lib\opencv_world4110.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

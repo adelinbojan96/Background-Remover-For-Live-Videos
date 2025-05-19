@@ -4,6 +4,18 @@
 -- OpenCV STATIC: OFF
 -- Found OpenCV 4.11.0 in C:/OpenCV/opencv/build/x64/vc16/lib
 -- You might need to add C:\OpenCV\opencv\build\x64\vc16\bin to your PATH to be able to run your applications.
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: C:/Users/adeli/CLionProjects/image_processing/cmake-build-release
+-- Found Python3: C:/Users/adeli/AppData/Local/Programs/Python/Python312/python.exe (found version "3.12.3") found components: Interpreter Development Development.Module Development.Embed
+CMake Error at CMakeLists.txt:11 (find_package):
+  Could not find a package configuration file provided by "nlohmann_json"
+  with any of the following names:
+
+    nlohmann_jsonConfig.cmake
+    nlohmann_json-config.cmake
+
+  Add the installation prefix of "nlohmann_json" to CMAKE_PREFIX_PATH or set
+  "nlohmann_json_DIR" to a directory containing one of the above files.  If
+  "nlohmann_json" provides a separate development package or SDK, be sure it
+  has been installed.
+
+
+-- Configuring incomplete, errors occurred!
