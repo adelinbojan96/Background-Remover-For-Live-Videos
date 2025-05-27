@@ -10,6 +10,8 @@ find_package(OpenCV REQUIRED)
 add_executable(image_processing_project
         static_camera.cpp
         main.cpp
+        dynamic_camera.cpp
+        dynamic_camera.h
 )
 
 target_include_directories(image_processing_project PRIVATE ${OpenCV_INCLUDE_DIRS})
