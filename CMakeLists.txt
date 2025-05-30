@@ -7,7 +7,12 @@ set(OpenCV_DIR "C:/OpenCV/opencv/build")
 
 find_package(OpenCV REQUIRED)
 
-add_executable(image_processing_project main.cpp)
+add_executable(image_processing_project
+        static_camera.cpp
+        main.cpp
+        dynamic_camera.cpp
+        dynamic_camera.h
+)
 
 target_include_directories(image_processing_project PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(image_processing_project PRIVATE ${OpenCV_LIBS})
