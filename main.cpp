@@ -3,15 +3,17 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
+#include <utility>
 using namespace std;
 using namespace cv;
 using namespace dnn;
 
+
 int main() {
-    cout << " Choose 0 for static camera or 1 for dynamic camera: ";
+    cout << "Choose 1 for static camera or 2 for dynamic camera: ";
     int mode;
     cin >> mode;
-    if (mode == 0) {
+    if (mode == 1) {
         try {
             vector<pair<string, string>> videos = {
                 {"Car Video 1 - Intersection\n", "../Videos/CarVideo1.mp4"},
@@ -41,6 +43,8 @@ int main() {
         }
 
     } else {
+        cout<<"Program will use all available CPU threads for processing (" <<getNumberOfCPUs()<<")\n";
+        setNumThreads(getNumberOfCPUs());
         try {
             vector<pair<string, string>> videos = {
                 {"Drone - Traffic 1",       "../Videos/Drone.mp4"},
@@ -79,40 +83,67 @@ int main() {
                     break;
 
                 resize(frame, frame, frameSize);
-                Mat gray;
-                cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+                Mat gray(frame.size(), CV_8UC1);
+
+                for (int y = 0; y < frame.rows; ++y)
+                    for (int x = 0; x < frame.cols; ++x) {
+                        Vec3b bgr = frame.at<Vec3b>(y, x);
+                        gray.at<uchar>(y, x) = uchar(0.114 * bgr[0] + 0.587 * bgr[1] + 0.299 * bgr[2]);
+                    }
 
                 Mat stabFrame = frame;
-                Mat stabGray;
-                cvtColor(stabFrame, stabGray, COLOR_BGR2GRAY);
+                Mat stabGray(stabFrame.size(), CV_8UC1);
+                for (int y = 0; y < stabFrame.rows; ++y)
+                    for (int x = 0; x < stabFrame.cols; ++x) {
+                        Vec3b bgr = stabFrame.at<Vec3b>(y, x);
+                        stabGray.at<uchar>(y, x) = uchar(0.114 * bgr[0] + 0.587 * bgr[1] + 0.299 * bgr[2]);
+                    }
 
-                // optical flow & mask
                 Mat flowResid  = hornSchunck(prevGray, stabGray, 1.0f, 50);
                 Mat movingMask = detectMovingMask(flowResid, 1.5f);
 
-                // for visualization of the algorithm
-                Mat thickMask;
                 int dilateSize = 17;
-                Mat element = getStructuringElement(MORPH_ELLIPSE, Size(dilateSize, dilateSize));
+                Mat element = ellipseKernel_2(dilateSize);
+
+                Mat thickMask;
                 dilate(movingMask, thickMask, element);
-                GaussianBlur(thickMask, thickMask, Size(9,9), 0);
+
+                thickMask = gaussianBlur(thickMask, 17, 5.0f);
 
                 Mat overlayFrame = stabFrame.clone();
-                overlayFrame.setTo(Scalar(0x4F, 0x57, 0x6B), thickMask); // #6B574F
 
-                Mat removedFrame = removeMovingObjects(stabFrame, thickMask, 14);
+                parallel_for_(Range(0, overlayFrame.rows), [&](const Range& r){
+                for (int y = r.start; y < overlayFrame.rows; ++y)
+                    for (int x = 0; x < overlayFrame.cols; ++x)
+                        if (thickMask.at<uchar>(y, x) > 0)
+                            overlayFrame.at<Vec3b>(y, x) = Vec3b(0x4F, 0x57, 0x6B);
+                });
 
-                Mat blurredFrame;
-                GaussianBlur(removedFrame, blurredFrame, Size(27,27), 0);
+                Mat removedFrame = removeMovingObjects(stabFrame, thickMask);
 
+                Mat blurredFrame = gaussianBlur(removedFrame, 27, 10.0f);
+
+                // blur the original frame
+                Mat maskBlurredFrame = stabFrame.clone();
+                parallel_for_(Range(0, maskBlurredFrame.rows), [&](const Range& r) {
+                    for (int y = r.start; y < maskBlurredFrame.rows; ++y)
+                        for (int x = 0; x < maskBlurredFrame.cols; ++x)
+                            if (thickMask.at<uchar>(y, x) > 128)
+                                maskBlurredFrame.at<Vec3b>(y, x) = blurredFrame.at<Vec3b>(y, x);
+                });
+                // blur using thick mask the removed objects frame
                 Mat finalFrame = removedFrame.clone();
-                for (int y = 0; y < finalFrame.rows; ++y) {
-                    for (int x = 0; x < finalFrame.cols; ++x) {
-                        if (thickMask.at<uchar>(y, x) > 128) {
-                            finalFrame.at<Vec3b>(y, x) = blurredFrame.at<Vec3b>(y, x);
+
+                parallel_for_(Range(0, finalFrame.rows), [&](const Range& r) {
+                    for (int y = r.start; y < finalFrame.rows; ++y) {
+                        for (int x = 0; x < finalFrame.cols; ++x) {
+                            if (thickMask.at<uchar>(y, x) > 128) {
+                                finalFrame.at<Vec3b>(y, x) = blurredFrame.at<Vec3b>(y, x);
+                            }
                         }
                     }
-                }
+                });
 
                 writerOverlay.write(finalFrame);
 
@@ -120,10 +151,12 @@ int main() {
                 imshow("Moving Mask",     movingMask);
                 imshow("Thick Mask",      thickMask);
                 imshow("Overlay Frame",   overlayFrame);
-                imshow("Final Blurry Removed", finalFrame);
+                imshow("Removed Moving Objects (Using Telea)", removedFrame);
+                imshow("Blurred Thick Mask (Using Blur)", maskBlurredFrame);
+                imshow("Final Blurry Removed (Telea + Blur)", finalFrame);
 
                 if ((char)waitKey(30) == 27) break;
-                prevGray = stabGray.clone();
+                    prevGray = stabGray.clone();
             }
 
             writerOverlay.release();

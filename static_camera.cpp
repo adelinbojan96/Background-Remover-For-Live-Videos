@@ -1,6 +1,5 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <vector>
 #include <stdexcept>
 
 using namespace std;
@@ -94,6 +93,7 @@ Mat captureBackground(const string& videoPath,
         for (int y = 0; y < targetSize.height; ++y) {
             Vec3b const* srcRow = resized.ptr<Vec3b>(y);
             Vec3f      * bgRow  = backgroundF.ptr<Vec3f>(y);
+
             for (int x = 0; x < targetSize.width; ++x) {
                 for (int c = 0; c < 3; ++c) {
                     bgRow[x][c] = float((1.0 - learningRate) * bgRow[x][c]

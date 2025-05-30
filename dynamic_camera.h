@@ -18,9 +18,14 @@ Mat compensateTranslation(const Mat& frame, const Point2f& t);
 
 Mat detectMovingMask(const Mat& flow, float thresh = 1.0f);
 
-Mat removeMovingObjects(const Mat& frame, const Mat& mask, int inpaintRadius = 10);
+Mat removeMovingObjects(const Mat& frame, const Mat& mask, int inpaint_radius = 10);
 
 Mat dimMaskRegion(const Mat& frame, const Mat& mask, float alpha = 0.5f);
 
+Mat gaussianBlur(const Mat& src, int ksize, float sigma);
+
+void dilate(const Mat& src, Mat& dst, const Mat& kernel);
+
+Mat ellipseKernel_2(int ksize);
 
 #endif
